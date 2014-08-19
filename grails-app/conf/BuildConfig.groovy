@@ -17,7 +17,7 @@ grails.project.fork = [
    // configure settings for the run-app JVM
    run: [maxMemory: 768, minMemory: 64,
          //Intellij needs run fork in debug, then connect remote debug there
-         debug: true,
+        // debug: true,
          maxPerm: 256, forkReserve:false],
    // configure settings for the run-war JVM
    war: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false],
