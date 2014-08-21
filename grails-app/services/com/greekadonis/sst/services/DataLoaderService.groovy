@@ -68,7 +68,7 @@ Dataset {
    def sstDayService
    def sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService
 
-   String testFileContents
+//   String testFileContents
 
    /**
     * @return Day 0 - the first day
@@ -146,19 +146,19 @@ Dataset {
 
       String contents = getFileContents(analysed_sst)
 
-      log.debug "loadDayFromLocalFile() - file.text - time: ${timer.time}ms"
+      log.debug "loadDayFromLocalFile() - file.text.size(): ${contents?.size()} - time: ${timer.time}ms"
 
-      Sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService reader =
-         new Sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService(contents)
-      SSTDay day = reader.day
+      SSTDay day = sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService.getDay(contents)
 
       log.info( "loadDayFromLocalFile($analysed_sst) - day: $day, in time: ${timer.time}ms")
       day
    }
 
    String getFileContents(String analysed_sst) {
-      String contents = testFileContents ?: null
-      if( !contents ){
+      String contents = '' //testFileContents ?: null
+//      log.debug "getFileContents() - HAS testFileContents: ${testFileContents != null}"
+//      log.info "getFileContents() - contents.size(): ${contents?.size()}"
+//      if( !contents ){
          File file = getFile(analysed_sst)
 
          log.info( "getFileContents($analysed_sst) - file: $file")
@@ -166,17 +166,17 @@ Dataset {
          if( file.isFile() ) {
             contents = file.text
          }
-      }
+//      }
       contents
    }
 
    String getFilePath(String analysed_sst){
-      String path = testFilePath ?: null
-      if( !path ) {
+      String path = ''   // testFilePath ?: null
+//      if( !path ) {
          String base = "${System.getProperty("user.dir")}/data"
          String name = "${DATA_FILE_NAME}_analysed_sst${analysed_sst.replace(":", ".")}.txt"
          path = "$base/$name"
-      }
+//      }
       assert !path.contains("null")
 
       path

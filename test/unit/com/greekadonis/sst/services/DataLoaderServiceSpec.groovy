@@ -1,7 +1,7 @@
 package com.greekadonis.sst.services
 
 import com.greekadonis.sst.SSTDay
-import com.greekadonis.sst.data.SstDataHelper
+import com.greekadonis.sst.data.Sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 
@@ -9,26 +9,26 @@ import spock.lang.Specification
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
 @TestFor(DataLoaderService)
-
 class DataLoaderServiceSpec extends Specification {
 
-   SstDayService sstDayService = Mock(SstDayService)
+   def sstDayService = Mock(SstDayService)
+   def readerService = Mock(Sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService)
+   def mockDay = Mock(SSTDay)
 
    def setup() {
       service.sstDayService = sstDayService
-      service.testFileContents = new SstDataHelper().createResult()
+      service.sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService = readerService
+      readerService.getDay(_ as String) >> mockDay
    }
 
    def cleanup() {
    }
 
    void "Can load day when file content available"() {
-
+      when:
       SSTDay day = service.loadDay(0)
 
-      expect:
-      day.time != null
-      !day.latitudes.empty
-      !day.latitudes[0].longitudes.empty
+      then:
+      day == mockDay
    }
 }
