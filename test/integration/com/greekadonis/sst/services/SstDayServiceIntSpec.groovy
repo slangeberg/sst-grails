@@ -59,7 +59,9 @@ class SstDayServiceIntSpec extends Specification {
 
       SSTDay first = sstDayService.findFirstLoadedDay()
 
-      log.info "find first: $first"
+//--> TODO: NO logging from Integ tests??
+
+      println "find first: $first"
 
       expect:
       first.sstIndex == 0
