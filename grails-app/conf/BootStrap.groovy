@@ -1,7 +1,10 @@
+import grails.util.Environment
+
 class BootStrap {
 
     def init = { servletContext ->
-       println "BootStrap.init()"
+       log.info "init() - running Environment: ${Environment.current}"
+
     }
     def destroy = {
     }

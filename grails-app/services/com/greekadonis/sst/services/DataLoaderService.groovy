@@ -146,7 +146,7 @@ Dataset {
 
       String contents = getFileContents(analysed_sst)
 
-//      println "loadDayFromLocalFile() - file.text - time: ${timer.time}ms"
+      log.debug "loadDayFromLocalFile() - file.text - time: ${timer.time}ms"
 
       Sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService reader =
          new Sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService(contents)

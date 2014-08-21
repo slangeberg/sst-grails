@@ -43,25 +43,25 @@ class SstDayServiceIntSpec extends Specification {
     }
     */
 
-    void "First loaded day is null, if no days populated"() {
+   void "First loaded day is null, if no days populated"() {
 
-        SSTDay first = sstDayService.findFirstLoadedDay()
+      SSTDay first = sstDayService.findFirstLoadedDay()
 
-        expect:
-        !first
-    }
+      expect:
+      !first
+   }
 
-    void "Can find first loaded day"() {
+   void "Can find first loaded day"() {
 
-        [ new SSTDay(sstIndex: 0, time:LocalDate.now().toDate()),
-          new SSTDay(sstIndex: 1, time:LocalDate.now().plusDays(1).toDate())
-        ]*.save(flush: true, failOnError: true)
+      [ new SSTDay(sstIndex: 0, time:LocalDate.now().toDate()),
+        new SSTDay(sstIndex: 1, time:LocalDate.now().plusDays(1).toDate())
+      ]*.save(flush: true, failOnError: true)
 
-        SSTDay first = sstDayService.findFirstLoadedDay()
+      SSTDay first = sstDayService.findFirstLoadedDay()
 
-       println "find first: $first"
+      log.info "find first: $first"
 
-        expect:
-        first.sstIndex == 0
-    }
+      expect:
+      first.sstIndex == 0
+   }
 }
