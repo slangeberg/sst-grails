@@ -95,39 +95,23 @@ environments {
     }
 }
 
-log4j = {
-  // Example of changing the log pattern for the default console appender:
-  //
-  //appenders {
-  //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
-  //}
+// log4j configuration
+log4j.main = {
+    // Example of changing the log pattern for the default console appender:
+    //
+    //appenders {
+    //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
+    //}
 
-  // Set level for all application artifacts
-//  info "grails.app"
-//  // Set for a specific controller in the default package
-//  debug "grails.app.controllers.YourController"
-//
-//  // Set for a specific domain class
-//  debug "grails.app.domain.org.example.Book"
-//
-//  // Set for all taglibs
-//  info "grails.app.taglib"
-
-  debug 'grails.app' //'*com.greekadonis'
-
-  error  'org.codehaus.groovy.grails.web.servlet',        // controllers
-      'org.codehaus.groovy.grails.web.pages',          // GSP
-      'org.codehaus.groovy.grails.web.sitemesh',       // layouts
-      'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-      'org.codehaus.groovy.grails.web.mapping',        // URL mapping
-      'org.codehaus.groovy.grails.commons',            // core / classloading
-      'org.codehaus.groovy.grails.plugins',            // plugins
-      'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
-      'org.springframework',
-      'org.hibernate',
-      'net.sf.ehcache.hibernate'
-
-//  root {
-//    warn()
-//  }
+    error  'org.codehaus.groovy.grails.web.servlet',        // controllers
+           'org.codehaus.groovy.grails.web.pages',          // GSP
+           'org.codehaus.groovy.grails.web.sitemesh',       // layouts
+           'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+           'org.codehaus.groovy.grails.web.mapping',        // URL mapping
+           'org.codehaus.groovy.grails.commons',            // core / classloading
+           'org.codehaus.groovy.grails.plugins',            // plugins
+           'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
+           'org.springframework',
+           'org.hibernate',
+           'net.sf.ehcache.hibernate'
 }

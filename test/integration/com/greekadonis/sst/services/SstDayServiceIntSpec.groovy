@@ -1,16 +1,51 @@
 package com.greekadonis.sst.services
 
 import com.greekadonis.sst.SSTDay
-import grails.test.mixin.TestFor
 import org.joda.time.LocalDate
 import spock.lang.Specification
 
-@TestFor(SstDayService)
 class SstDayServiceIntSpec extends Specification {
+
+   def sstDayService
+
+   /*
+       void "Can query latitude by day"() {
+
+        SSTDay day = new SSTDay(time: new LocalDate(2006, 04, 03))
+            .addToLatitudes(new SSTDayLatitude(lat: 20.5))
+            .save(flush: true, failOnError: true)
+
+        SSTDayLatitude found = SSTDayLatitude.where {
+            day.time > new Date(2006, 04, 02)
+        }.find()
+
+        expect:
+        day.time == found.day.time
+    }
+
+    void "Can query latitudes"() {
+
+        SSTDay day = new SSTDay(time: new LocalDate(2006, 04, 03))
+            .addToLatitudes(new SSTDayLatitude(lat: 0.5))
+            .addToLatitudes(new SSTDayLatitude(lat: 10.0))
+            .addToLatitudes(new SSTDayLatitude(lat: 15.0))
+            .addToLatitudes(new SSTDayLatitude(lat: 25.0))
+            .save(flush: true, failOnError: true)
+
+        def query = SSTDayLatitude.where {
+            lat > 10 && lat < 25
+        }
+
+        expect:
+        Set all = query.findAll()
+        all.size() == 1
+        all[0].lat == 15
+    }
+    */
 
     void "First loaded day is null, if no days populated"() {
 
-        SSTDay first = service.findFirstLoadedDay()
+        SSTDay first = sstDayService.findFirstLoadedDay()
 
         expect:
         !first
@@ -22,7 +57,9 @@ class SstDayServiceIntSpec extends Specification {
           new SSTDay(sstIndex: 1, time:LocalDate.now().plusDays(1).toDate())
         ]*.save(flush: true, failOnError: true)
 
-        SSTDay first = service.findFirstLoadedDay()
+        SSTDay first = sstDayService.findFirstLoadedDay()
+
+       println "find first: $first"
 
         expect:
         first.sstIndex == 0

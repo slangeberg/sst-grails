@@ -4,7 +4,5 @@ class SSTDayLongitude {
 
    static hasMany = [values: SSTDayLongitudeValue]
 
-//    static belongsTo = [day:SSTDayLatitude]
-
    Double lon
 }

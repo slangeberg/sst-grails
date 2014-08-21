@@ -6,10 +6,6 @@ class SSTDayLatitude {
    static hasMany = [longitudes: SSTDayLongitude]
 
    Double lat
-//
-//   public SSTDayLatitude() {
-//      longitudes = []
-//   }
 
    @Override
    String toString() {

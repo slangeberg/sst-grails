@@ -3,6 +3,7 @@ package com.greekadonis.sst
 import com.greekadonis.gandas.DataFrame
 import com.greekadonis.sst.data.SstDataHelper
 import grails.converters.JSON
+import org.joda.time.LocalDate
 
 class SSTDayController {
 
@@ -32,5 +33,15 @@ df - mean values: ${df.apply(DataFrame.mean)}
 
    def testRead = {
       render sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService.getModel(new SstDataHelper().createResult()).toString()
+   }
+
+   def testWrite = {
+      SSTDay day = new SSTDay(time: new LocalDate(2006, 04, 03))
+         .addToLatitudes(new SSTDayLatitude(lat: 0.5))
+         .addToLatitudes(new SSTDayLatitude(lat: 10.0))
+         .addToLatitudes(new SSTDayLatitude(lat: 15.0))
+         .addToLatitudes(new SSTDayLatitude(lat: 25.0))
+         .save(flush: true, failOnError: true)
+      render "saved day: ${SSTDay.get(day.id)}"
    }
 }
