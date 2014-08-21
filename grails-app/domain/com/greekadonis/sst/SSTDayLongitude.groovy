@@ -7,8 +7,4 @@ class SSTDayLongitude {
 //    static belongsTo = [day:SSTDayLatitude]
 
    Double lon
-
-   public SSTDayLongitude() {
-      values = []
-   }
 }

@@ -54,9 +54,9 @@ class SSTDay {
 //        "[SSTDay - id: $id]"
 //    }
 
-   public SSTDay() {
-      latitudes = []
-   }
+//   public SSTDay() {
+//    //  latitudes = []
+//   }
 
     @Override
     String toString() {

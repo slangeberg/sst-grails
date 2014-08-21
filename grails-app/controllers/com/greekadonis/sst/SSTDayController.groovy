@@ -1,12 +1,14 @@
 package com.greekadonis.sst
 
 import com.greekadonis.gandas.DataFrame
-import com.greekadonis.sst.services.DataLoaderService
+import com.greekadonis.sst.data.SstDataHelper
+import grails.converters.JSON
 
 class SSTDayController {
+
     static scaffold = true
 
-    DataLoaderService dataLoaderService
+    def sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService
     
     def day = {
         if( params.id ){
@@ -26,4 +28,9 @@ df: $df<br/>
 df - mean values: ${df.apply(DataFrame.mean)}
 """
     }
+
+
+   def testRead = {
+      render sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService.getModel(new SstDataHelper().createResult()).toString()
+   }
 }

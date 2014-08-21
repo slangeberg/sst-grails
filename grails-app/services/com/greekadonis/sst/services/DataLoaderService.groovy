@@ -1,10 +1,9 @@
 package com.greekadonis.sst.services
 
 import com.greekadonis.sst.SSTDay
-import com.greekadonis.sst.data.SST_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_Reader
+import com.greekadonis.sst.data.Sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService
 import grails.transaction.Transactional
 import org.apache.commons.lang3.time.StopWatch
-import org.springframework.transaction.annotation.Propagation
 
 /**
  * Tries to load SSTDay related data in following order:
@@ -67,6 +66,7 @@ Dataset {
    String lonParams = "[0:$stepSize:$MAX_LON]"
 
    def sstDayService
+   def sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService
 
    String testFileContents
 
@@ -132,9 +132,7 @@ Dataset {
 
          log.info("loadDayFromRemoteSource() - analysed_sst: $analysed_sst, response time: ${timer.getTime()}ms")
 
-         SST_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_Reader reader =
-            new SST_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_Reader(content)
-         day = reader.getDay() //analysed_sst)
+         day = sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService.getDay(content)
       }
 
       log.info("loadDayFromRemoteSource() - analysed_sst: $analysed_sst, time: ${timer.getTime()}ms")
@@ -150,8 +148,8 @@ Dataset {
 
 //      println "loadDayFromLocalFile() - file.text - time: ${timer.time}ms"
 
-      SST_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_Reader reader =
-         new SST_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_Reader(contents)
+      Sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService reader =
+         new Sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService(contents)
       SSTDay day = reader.day
 
       log.info( "loadDayFromLocalFile($analysed_sst) - day: $day, in time: ${timer.time}ms")

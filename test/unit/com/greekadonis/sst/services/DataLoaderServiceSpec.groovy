@@ -23,10 +23,10 @@ class DataLoaderServiceSpec extends Specification {
    }
 
    void "Can load day when file content available"() {
-      when:
+
       SSTDay day = service.loadDay(0)
 
-      then:
+      expect:
       day.time != null
       !day.latitudes.empty
       !day.latitudes[0].longitudes.empty

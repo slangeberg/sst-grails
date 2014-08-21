@@ -6,13 +6,13 @@ class SSTDayLatitude {
    static hasMany = [longitudes: SSTDayLongitude]
 
    Double lat
-
-   public SSTDayLatitude() {
-      longitudes = []
-   }
+//
+//   public SSTDayLatitude() {
+//      longitudes = []
+//   }
 
    @Override
    String toString() {
-      "[SSTDayLatitude - lat: $lat, day: $day]"
+      "[SSTDayLatitude - lat: $lat, day.id: ${day?.id}]"
    }
 }
