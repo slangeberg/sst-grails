@@ -53,8 +53,8 @@ class SstDayServiceIntSpec extends Specification {
 
    void "Can find first loaded day"() {
 
-      [ new SSTDay(sstIndex: 0, time:LocalDate.now().toDate()),
-        new SSTDay(sstIndex: 1, time:LocalDate.now().plusDays(1).toDate())
+      [ new SSTDay(sstIndex: 0, dataset: 'dataset', time:LocalDate.now().toDate()),
+        new SSTDay(sstIndex: 1, dataset: 'dataset', time:LocalDate.now().plusDays(1).toDate())
       ]*.save(flush: true, failOnError: true)
 
       SSTDay first = sstDayService.findFirstLoadedDay()
