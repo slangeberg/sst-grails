@@ -36,30 +36,20 @@ analysed_sst.lon[2]
 //@GrailsCompileStatic
 class SSTDay {
 
-    static constraints = {
-        time unique: true
-        sstIndex unique: true
-    }
+   static constraints = {
+      time unique: true
+      sstIndex unique: true
+   }
 
-    static hasMany = [latitudes: SSTDayLatitude]
+   static hasMany = [latitudes: SSTDayLatitude]
 
-    LocalDate time
+   LocalDate time
 
-    int sstIndex //index for day in JPL labs datasets
+   int sstIndex
+   String dataset
 
-//    List<Double> lat
-//    List<Double> lon
-//
-//    public String toString() {
-//        "[SSTDay - id: $id]"
-//    }
-
-//   public SSTDay() {
-//    //  latitudes = []
-//   }
-
-    @Override
-    String toString() {
-        "[SSTDay - id: $id, sstIndex: $sstIndex, time: $time, latitudes.size(): ${latitudes ? latitudes.size() : 'NULL'}]"
-    }
+   @Override
+   String toString() {
+      "[SSTDay - id: $id, sstIndex: $sstIndex, time: $time, latitudes.size(): ${latitudes ? latitudes.size() : 'NULL'}]"
+   }
 }
