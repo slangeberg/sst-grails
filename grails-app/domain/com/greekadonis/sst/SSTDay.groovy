@@ -40,6 +40,9 @@ class SSTDay {
       time unique: true
       sstIndex unique: true
    }
+   static mapping = {
+      dataset type: "text" // Default String is varchar(255)
+   }
 
    static hasMany = [latitudes: SSTDayLatitude]
 

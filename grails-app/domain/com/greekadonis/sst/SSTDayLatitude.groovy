@@ -9,6 +9,6 @@ class SSTDayLatitude {
 
    @Override
    String toString() {
-      "[SSTDayLatitude - lat: $lat, day.id: ${day?.id}]"
+      "[SSTDayLatitude - lat: $lat, day: $day, longitudes: $longitudes]"
    }
 }
