@@ -90,7 +90,7 @@ Dataset {
          log.info("loadDay($sstIndex) - DB HIT")
       } else {
          log.info("loadDay($sstIndex) - DB MISS")
-         day = loadDayFromRemoteSource(getAnalysedSstParams(sstIndex))
+         day = loadDayFromRemoteSource(sstIndex)
       }
       log.info "loadDay($sstIndex) - time: ${timer.time}ms"
       day
@@ -104,9 +104,13 @@ Dataset {
     * @param analysed_sst - String in form of: [time][lat][lon]
     * @return
     */
-   SSTDay loadDayFromRemoteSource(String analysed_sst) {
+   SSTDay loadDayFromRemoteSource(int sstIndex) {
 
       StopWatch timer = createAndStartStopWatch()
+
+      assert sstIndex >= 0
+
+      String analysed_sst = getAnalysedSstParams(sstIndex)
 
       SSTDay day = loadDayFromLocalFile(analysed_sst)
 
@@ -133,6 +137,7 @@ Dataset {
          log.info("loadDayFromRemoteSource() - analysed_sst: $analysed_sst, response time: ${timer.getTime()}ms")
 
          day = sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService.getDay(content)
+         day.sstIndex = sstIndex
       }
 
       log.info("loadDayFromRemoteSource() - analysed_sst: $analysed_sst, time: ${timer.getTime()}ms")
