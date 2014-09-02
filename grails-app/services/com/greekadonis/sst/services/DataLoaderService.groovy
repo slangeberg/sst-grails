@@ -137,8 +137,8 @@ Dataset {
          log.info("loadDayFromRemoteSource() - analysed_sst: $analysed_sst, response time: ${timer.getTime()}ms")
 
          day = sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService.getDay(content)
-         day.sstIndex = sstIndex
       }
+      day.sstIndex = sstIndex
 
       log.info("loadDayFromRemoteSource() - analysed_sst: $analysed_sst, time: ${timer.getTime()}ms")
 

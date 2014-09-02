@@ -9,5 +9,9 @@ class SSTDayLongitudeValue {
 
    static belongsTo = [longitude:SSTDayLongitude]
 
-   Integer analysed_sst
+   Short analysed_sst
+
+   boolean isEmptyValue() {
+      analysed_sst == EMPTY_VALUE
+   }
 }

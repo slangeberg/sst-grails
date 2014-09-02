@@ -21,13 +21,19 @@ class ReportController {
     timer.start()
 
     Boolean cache = params.getBoolean('cache')
+    Boolean mock = params.getBoolean('mock')
 
-    Map<SSTDay, Double> dailyAverages = reportService.getDailyAverages(true, cache != null ? cache : true)
+    Map<SSTDay, Double> dailyAverages = reportService.getDailyAverages(
+       mock != null ? mock : false,
+       cache != null ? cache : true)
 
-    SSTDay firstDay = dailyAverages.keySet()[0]
+    SSTDay firstDay = dailyAverages?.keySet()[0]
 
     String page = """
-#days: ${dailyAverages.size()}, #latitudes/day: ${firstDay.latitudes.size()}, #longitudes/day: ${firstDay.latitudes[0].longitudes.size()}, time: ${timer.time}ms<br/>
+#days: ${dailyAverages?.size()},
+#latitudes/day: ${firstDay?.latitudes?.size()},
+#longitudes/day: ${firstDay?.latitudes?.getAt(0)?.longitudes?.size()},
+time: $timer<br/>
 <br/>
 <h3>avg daily temps:</h3> <br/>
 <table>
