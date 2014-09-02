@@ -85,6 +85,14 @@ grails.hibernate.pass.readonly = false
 // configure passing read-only to OSIV session by default, requires "singleSession = false" OSIV mode
 grails.hibernate.osiv.readonly = false
 
+
+///////////// START custom runtime Config ////////////////
+
+com.greekadonis.sst = {
+   //how many to skip: 1 = every step, 2 = every other, etc.
+   latLonStepSize = 1800
+}
+
 environments {
    development {
       grails.logging.jul.usebridge = true
@@ -94,7 +102,10 @@ environments {
    }
    production {
       grails.logging.jul.usebridge = false
-      // TODO: grails.serverURL = "http://www.changeme.com"
+
+// TODO: grails.serverURL = "http://www.changeme.com"
+
+      com.greekadonis.sst.latLonStepSize = 16 //2 //finer grain detail
    }
 }
 
@@ -115,7 +126,7 @@ log4j.main = {
       }
       production {
          // Set level for all application artifacts
-         warn "grails.app"
+         info "grails.app"
       }
    }
 

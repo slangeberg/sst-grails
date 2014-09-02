@@ -14,11 +14,11 @@ grails.project.fork = [
    // Intellij does not debug with forked process, by default
    test: false,  //[maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
    // run-app JVM
-   run: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false],
+   run: [maxMemory: 1536, minMemory: 1024, debug: false, maxPerm: 512, forkReserve:false],
    // run-war JVM
-   war: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false],
+   war: [maxMemory: 1536, minMemory: 1024, debug: false, maxPerm: 512, forkReserve:false],
    // Console UI JVM
-   console: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256]
+   console: [maxMemory: 768, minMemory: 256, debug: false, maxPerm: 256]
 ]
 
 grails.project.dependency.resolver = "maven" // or ivy

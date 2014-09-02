@@ -55,20 +55,16 @@ Dataset {
     String time[time = 2951];
 } sea_surface_temperature%2fALL_UKMO-L4HRfnd-GLOB-OSTIA_v01-fv02%2enc;
  */
-   // @see: DDS
-   public static final int MAX_LAT = 3600 - 1;
-   public static final int MAX_LON = 7200 - 1;
 
    final String DATA_FILE_NAME = 'ALL_UKMO-L4HRfnd-GLOB-OSTIA_v01-fv02.nc.ascii'
 
-   int stepSize = 1800 //how many to skip: 1 = every step, 2 = every other, etc.
-   String latParams = "[0:$stepSize:$MAX_LAT]"
-   String lonParams = "[0:$stepSize:$MAX_LON]"
+//   int stepSize = 1800 //how many to skip: 1 = every step, 2 = every other, etc.
+//   String latParams = "[0:$stepSize:$MAX_LAT]"
+//   String lonParams = "[0:$stepSize:$MAX_LON]"
 
    def sstDayService
    def sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService
-
-//   String testFileContents
+   def systemConfigService
 
    /**
     * @return Day 0 - the first day
@@ -97,7 +93,7 @@ Dataset {
    }
 
    String getAnalysedSstParams(int sstIndex){
-      "[$sstIndex]$latParams$lonParams"
+      "[$sstIndex]${systemConfigService.getLatitudeParameters()}${systemConfigService.getLongitudeParameters()}"
    }
 
    /**
@@ -153,35 +149,31 @@ Dataset {
 
       log.debug "loadDayFromLocalFile() - file.text.size(): ${contents?.size()} - time: ${timer.time}ms"
 
-      SSTDay day = sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService.getDay(contents)
-
+      SSTDay day = null
+      if( !contents?.empty ) {
+         sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService.getDay(contents)
+      }
       log.info( "loadDayFromLocalFile($analysed_sst) - day: $day, in time: ${timer.time}ms")
       day
    }
 
    String getFileContents(String analysed_sst) {
-      String contents = '' //testFileContents ?: null
-//      log.debug "getFileContents() - HAS testFileContents: ${testFileContents != null}"
-//      log.info "getFileContents() - contents.size(): ${contents?.size()}"
-//      if( !contents ){
-         File file = getFile(analysed_sst)
+      String contents = ''
+      File file = getFile(analysed_sst)
 
-         log.info( "getFileContents($analysed_sst) - file: $file")
+      log.info( "getFileContents($analysed_sst) - file: $file")
 
-         if( file.isFile() ) {
-            contents = file.text
-         }
-//      }
+      if( file.isFile() ) {
+         contents = file.text
+      }
       contents
    }
 
    String getFilePath(String analysed_sst){
-      String path = ''   // testFilePath ?: null
-//      if( !path ) {
-         String base = "${System.getProperty("user.dir")}/data"
-         String name = "${DATA_FILE_NAME}_analysed_sst${analysed_sst.replace(":", ".")}.txt"
-         path = "$base/$name"
-//      }
+      String path = ''
+      String base = "${System.getProperty("user.dir")}/data"
+      String name = "${DATA_FILE_NAME}_analysed_sst${analysed_sst.replace(":", ".")}.txt"
+      path = "$base/$name"
       assert !path.contains("null")
 
       path
