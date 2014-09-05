@@ -91,7 +91,7 @@ grails.hibernate.osiv.readonly = false
 ///////////// START custom runtime Config ////////////////
 
 //how many to skip: 1 = every step, 2 = every other, etc.
-com.greekadonis.sst.latLonStepSize = 40
+com.greekadonis.sst.latLonStepSize = 10
 
 environments {
    development {
