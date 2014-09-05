@@ -45,7 +45,7 @@ class ReportService {
       } else {
          days = SSTDay.list(sort:'sstIndex', order: 'asc')
       }
-      log.info("getDailyAverages() - got days in: ${timer.time}ms")
+      log.info("getDailyAverages() - got days at: ${timer.time}ms")
 
       days.each { SSTDay day ->
 
@@ -55,7 +55,9 @@ class ReportService {
          Double sum = 0
          day.latitudes.each { SSTDayLatitude lat ->
             lat.longitudes.each { SSTDayLongitude lon ->
-               log.info "getDailyAverages() - lon.value.isEmptyValue(): ${lon.value.isEmptyValue()}, lon.value.analysed_sst: ${lon.value.analysed_sst}"
+               if( log.debugEnabled ) {
+                  log.debug "getDailyAverages() - lon.value.isEmptyValue(): ${lon.value.isEmptyValue()}, lon.value.analysed_sst: ${lon.value.analysed_sst}"
+               }
                if( !lon.value.isEmptyValue() ) {
                   count++
                   sum += lon.value.analysed_sst

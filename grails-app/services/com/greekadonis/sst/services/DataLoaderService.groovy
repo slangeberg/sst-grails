@@ -118,13 +118,17 @@ Dataset {
 
          log.info('loadDayFromRemoteSource() - cache MISS')
 
+         timer.split()
+
          String baseUrl = "http://thredds.jpl.nasa.gov/thredds/dodsC/sea_surface_temperature/$DATA_FILE_NAME"
          String analysedSSTUrl = "$baseUrl?analysed_sst"
          String url = "$analysedSSTUrl$analysed_sst"
 
-         log.info("loadDayFromRemoteSource() - url: $url")
+         log.info("loadDayFromRemoteSource() - START load from url: $url")
 
          String content = url.toURL().text
+
+         log.info("loadDayFromRemoteSource() - END load from url: $url, took ${timer.time-timer.splitTime}ms")
 
          //Write to disk
 
@@ -136,7 +140,7 @@ Dataset {
       }
       day.sstIndex = sstIndex
 
-      log.info("loadDayFromRemoteSource() - analysed_sst: $analysed_sst, time: ${timer.getTime()}ms")
+      log.info("loadDayFromRemoteSource() - COMPLETE - analysed_sst: $analysed_sst, time: ${timer.getTime()}ms")
 
       day
    }

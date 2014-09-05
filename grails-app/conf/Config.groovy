@@ -91,7 +91,7 @@ grails.hibernate.osiv.readonly = false
 ///////////// START custom runtime Config ////////////////
 
 //how many to skip: 1 = every step, 2 = every other, etc.
-com.greekadonis.sst.latLonStepSize = 900
+com.greekadonis.sst.latLonStepSize = 100
 
 environments {
    development {
@@ -122,7 +122,9 @@ log4j.main = {
 
    environments {
       development {
-         debug "grails.app"
+         debug 'grails.app'
+
+         info 'grails.app.services.com.greekadonis.sst.services.ReportService'
       }
       test {
          debug "grails.app"
