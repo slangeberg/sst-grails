@@ -13,11 +13,15 @@ class DataLoaderServiceSpec extends Specification {
 
    def sstDayService = Mock(SstDayService)
    def readerService = Mock(Sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService)
+   def systemConfigService = Mock(SystemConfigService)
+
    def mockDay = Mock(SSTDay)
 
    def setup() {
       service.sstDayService = sstDayService
+      service.systemConfigService = systemConfigService
       service.sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService = readerService
+
       readerService.getDay(_ as String) >> mockDay
    }
 
