@@ -30,6 +30,9 @@ class ReportController {
     SSTDay firstDay = dailyAverages?.keySet()[0]
 
     String page = """
+<style>
+   td { padding-right: .7em; }
+</style>
 #days: ${dailyAverages?.size()},
 #latitudes/day: ${firstDay?.latitudes?.size()},
 #longitudes/day: ${firstDay?.latitudes?.getAt(0)?.longitudes?.size()},
@@ -37,13 +40,14 @@ time: $timer<br/>
 <br/>
 <h3>avg daily temps:</h3> <br/>
 <table>
-  <hr>
-    <td>SST Index</td>
-    <td>Daily avg.</td>
-  </hr>
+  <tr>
+    <th>SST Index</th>
+    <th>Date</th>
+    <th>Daily avg.</th>
+  </tr>
 """
-    dailyAverages.each{ SSTDay key, Double val ->
-      page += "<tr><td>${key.sstIndex}</td><td>${val}</td></tr>"
+    dailyAverages.each{ SSTDay day, Double average ->
+      page += "<tr><td>${day.sstIndex}</td><td>${day.time}</td><td>${average}</td></tr>"
     }
     page += "</table>"
     render page

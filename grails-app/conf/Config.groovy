@@ -91,7 +91,7 @@ grails.hibernate.osiv.readonly = false
 ///////////// START custom runtime Config ////////////////
 
 //how many to skip: 1 = every step, 2 = every other, etc.
-com.greekadonis.sst.latLonStepSize = 1800
+com.greekadonis.sst.latLonStepSize = 900
 
 environments {
    development {
@@ -105,7 +105,7 @@ environments {
 
 // TODO: grails.serverURL = "http://www.changeme.com"
 
-      com.greekadonis.sst.latLonStepSize = 16 //2 //finer grain detail
+      com.greekadonis.sst.latLonStepSize = 2 //finer grain detail
    }
 }
 
