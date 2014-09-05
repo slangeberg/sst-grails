@@ -1,3 +1,5 @@
+import grails.util.Environment
+
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
 // in the classpath in ConfigSlurper format
@@ -88,10 +90,8 @@ grails.hibernate.osiv.readonly = false
 
 ///////////// START custom runtime Config ////////////////
 
-com.greekadonis.sst = {
-   //how many to skip: 1 = every step, 2 = every other, etc.
-   latLonStepSize = 1800
-}
+//how many to skip: 1 = every step, 2 = every other, etc.
+com.greekadonis.sst.latLonStepSize = 1800
 
 environments {
    development {
@@ -108,6 +108,9 @@ environments {
       com.greekadonis.sst.latLonStepSize = 16 //2 //finer grain detail
    }
 }
+
+println "Config.groovy - Environment.current: ${Environment.current}"
+println "Config.groovy - com.greekadonis.sst.latLonStepSize: ${com.greekadonis.sst.latLonStepSize}"
 
 // log4j configuration
 log4j.main = {
