@@ -1,7 +1,6 @@
 package com.greekadonis.sst.services
 
 import com.greekadonis.sst.SSTDay
-import com.greekadonis.sst.data.Sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService
 import grails.transaction.Transactional
 import org.apache.commons.lang3.time.StopWatch
 
