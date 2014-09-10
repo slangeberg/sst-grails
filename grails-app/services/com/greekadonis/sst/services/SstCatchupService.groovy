@@ -19,8 +19,6 @@ class SstCatchupService {
       boolean isRunning = catchupRunning()
       log.debug("runCatchup() - isRunning: $isRunning")
 
-      //CatchupProcessState catchupProcessState = getProcessState()
-
       if( isRunning ){
          def running = getAllRunning()
          return "Catchup is already running ${running.size()} processes: <br/>${running}"
@@ -44,8 +42,6 @@ class SstCatchupService {
       boolean isRunning = catchupRunning()
       log.debug("runCatchup() - isRunning: $isRunning")
 
-      //CatchupProcessState catchupProcessState = getProcessState()
-
       if( isRunning ){
          def running = getAllRunning()
          return "Catchup is already running ${running.size()} processes: <br/>${running}"
@@ -55,8 +51,6 @@ class SstCatchupService {
 
          StopWatch timer = new StopWatch()
          timer.start()
-
-         // SstCatchupProcess process = null
 
          SSTDay day = null
 

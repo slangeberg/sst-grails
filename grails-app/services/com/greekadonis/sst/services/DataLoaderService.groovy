@@ -151,8 +151,9 @@ Dataset {
 
       String contents = getFileContents(analysed_sst)
 
-      log.debug "loadDayFromLocalFile() - file.text.size(): ${contents?.size()} - time: ${timer.time}ms"
-
+      if(log.debugEnabled) {
+         log.debug "loadDayFromLocalFile() - file.text.size(): ${contents?.size()} - time: ${timer.time}ms"
+      }
       SSTDay day = null
       if( !contents?.empty ) {
          sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService.getDay(contents)

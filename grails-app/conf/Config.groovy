@@ -105,14 +105,10 @@ environments {
 
 // TODO: grails.serverURL = "http://www.changeme.com"
 
-      com.greekadonis.sst.latLonStepSize = 2 //finer grain detail
+      com.greekadonis.sst.latLonStepSize = 10
    }
 }
 
-println "Config.groovy - Environment.current: ${Environment.current}"
-println "Config.groovy - com.greekadonis.sst.latLonStepSize: ${com.greekadonis.sst.latLonStepSize}"
-
-// log4j configuration
 log4j.main = {
    // Example of changing the log pattern for the default console appender:
    //
@@ -147,3 +143,9 @@ log4j.main = {
       'org.hibernate',
       'net.sf.ehcache.hibernate'
 }
+
+/////////////////////////////////////////////////////////
+
+println "Config.groovy - Environment.current: ${Environment.current}"
+println "Config.groovy - com.greekadonis.sst.latLonStepSize: ${com.greekadonis.sst.latLonStepSize}"
+
