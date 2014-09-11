@@ -6,6 +6,7 @@ data/
 
 ###### Generated ########
 
+*.db
 *.iml
 *.ipr
 *.iws

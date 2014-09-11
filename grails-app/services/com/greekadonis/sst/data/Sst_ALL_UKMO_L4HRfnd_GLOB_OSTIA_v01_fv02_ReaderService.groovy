@@ -52,7 +52,6 @@ analysed_sst.lon[2]
          time: null
       ]
 
-
       //
       // Takes raw results as returned from SST JPL remote service
       //
