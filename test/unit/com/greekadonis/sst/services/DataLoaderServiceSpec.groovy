@@ -3,6 +3,7 @@ package com.greekadonis.sst.services
 import com.greekadonis.sst.SSTDay
 import com.greekadonis.sst.data.Sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService
 import grails.test.mixin.TestFor
+import spock.lang.Ignore
 import spock.lang.Specification
 
 /**
@@ -23,16 +24,23 @@ class DataLoaderServiceSpec extends Specification {
       service.sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService = readerService
 
       readerService.getDay(_ as String) >> mockDay
+      systemConfigService.getLatitudeParameters() >> "[0:1]"
+      systemConfigService.getLongitudeParameters() >> "[0:1]"
    }
 
    def cleanup() {
    }
 
+   @Ignore("Stop loading real stuff!")
    void "Can load day when file content available"() {
       when:
       SSTDay day = service.loadDay(0)
 
       then:
       day == mockDay
+   }
+
+   void "Write more tests!!"() {
+
    }
 }
