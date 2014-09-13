@@ -64,6 +64,11 @@ Dataset {
    def sstDayService
    def sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService
    def systemConfigService
+   def saveWithSimpleJdbcService
+
+   def describe() {
+      saveWithSimpleJdbcService.describe()
+   }
 
    /**
     * @return Day 0 - the first day
@@ -107,7 +112,7 @@ Dataset {
 
       String analysed_sst = getAnalysedSstParams(sstIndex)
 
-      SSTDay day = loadDayFromLocalFile(analysed_sst)
+      SSTDay day = loadDayFromLocalFile(sstIndex, analysed_sst)
 
       if ( day ) {
          log.info('loadDayFromRemoteSource() - cache HIT')
@@ -135,7 +140,7 @@ Dataset {
 
          log.info("loadDayFromRemoteSource() - analysed_sst: $analysed_sst, response time: ${timer.getTime()}ms")
 
-         day = sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService.getDay(content)
+         day = sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService.getDay(sstIndex, content)
       }
       day.sstIndex = sstIndex
 
@@ -144,19 +149,16 @@ Dataset {
       day
    }
 
-   SSTDay loadDayFromLocalFile(String analysed_sst) {
+   SSTDay loadDayFromLocalFile(int sstIndex, String analysed_sst) {
 
       StopWatch timer = createAndStartStopWatch()
 
       String contents = getFileContents(analysed_sst)
 
-      if(log.debugEnabled) {
-         log.debug "loadDayFromLocalFile() - file.text.size(): ${contents?.size()} - time: ${timer.time}ms"
+      if(log.infoEnabled) {
+         log.info "loadDayFromLocalFile() - file.text.size(): ${contents?.size()} - time: ${timer.time}ms"
       }
-      SSTDay day = null
-      if( !contents?.empty ) {
-         sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService.getDay(contents)
-      }
+      SSTDay day = sst_ALL_UKMO_L4HRfnd_GLOB_OSTIA_v01_fv02_ReaderService.getDay(sstIndex, contents)
       log.info( "loadDayFromLocalFile($analysed_sst) - day: $day, in time: ${timer.time}ms")
       day
    }
@@ -173,9 +175,14 @@ Dataset {
       contents
    }
 
+   String fileBasePath
+
    String getFilePath(String analysed_sst){
       String path = ''
-      String base = "${System.getProperty("user.dir")}/data"
+      String base = fileBasePath ?: "${System.getProperty("user.dir")}/data"
+
+      log.info "getFilePath($analysed_sst) - base: $base"
+
       String name = "${DATA_FILE_NAME}_analysed_sst${analysed_sst.replace(":", ".")}.txt"
       path = "$base/$name"
       assert !path.contains("null")

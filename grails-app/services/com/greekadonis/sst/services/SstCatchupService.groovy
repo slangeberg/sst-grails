@@ -19,9 +19,11 @@ class SstCatchupService {
       boolean isRunning = catchupRunning()
       log.debug("runCatchup() - isRunning: $isRunning")
 
+      String msg = ''
+
       if( isRunning ){
          def running = getAllRunning()
-         return "Catchup is already running ${running.size()} processes: <br/>${running}"
+         msg = "Catchup is already running ${running.size()} processes: <br/>${running}"
 
       } else {
          //start one
@@ -32,10 +34,11 @@ class SstCatchupService {
          SSTDay day = sstDayService.findLastLoadedDay()
          day = runCatchupForDay(day ? day.sstIndex + 1 : 0)
 
-         log.info "runCatchup() - went thru days in ${timer.time}ms"
+         log.info "runCatchup() - went thru day in ${timer.time}ms"
 
-         return "Ran catchup for: $day"
+         msg = "Ran catchup for: $day"
       }
+      msg
    }
 
    def runCatchup(){
@@ -92,23 +95,30 @@ class SstCatchupService {
          log.info "runCatchupForDay() - day: $day"
 
          if (day) {
-           // log.debug "runCatchupForDay() - found day: $day"
+           log.info "runCatchupForDay() - found day with id: ${day?.id}"
 
-            if( !day.id ) {
-
-               log.info "runCatchupForDay() - day has NO ID, will verify..."
-
-               //verify state of day
-               assert day.time
-               assert !day.latitudes?.empty
-               assert !day.latitudes[0].longitudes?.empty
-
-               log.info "runCatchupForDay() - day Verified - starting save()..."
-
-               // All good,   persist
-               day.save(flush: true, failOnError: true)
+//            if( !day.id ) {
+//
+//               log.info "runCatchupForDay() - day has NO ID, will verify..."
+//
+//               //verify state of day
+//               assert day.time
+//               assert !day.latitudes?.empty
+//               assert !day.latitudes[0].longitudes?.empty
+//
+//               log.info "runCatchupForDay() - day Verified - starting save(flush: false)..."
+//
+//               StopWatch timer = new StopWatch()
+//               timer.start()
+//
+//               // All good,   persist
+//               day.save(/*flush: true,*/ failOnError: true)
+//
+//               log.info "runCatchupForDay() - day.save() completed in ${timer.time}ms"
+//            }
+            if( day.id != null ) {
+               process.success = true
             }
-            process.success = true
 
          } else {
 

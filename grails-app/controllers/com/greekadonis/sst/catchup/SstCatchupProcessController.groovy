@@ -7,6 +7,11 @@ class SstCatchupProcessController {
    static scaffold = true
 
    def sstCatchupService
+   def dataLoaderService
+
+   def describe() {
+      render dataLoaderService.describe()
+   }
 
    def report() {
       render {
@@ -27,16 +32,16 @@ class SstCatchupProcessController {
    }
 
    def run() {
-      task { // just render async for now - async remote request, later?
+     // task { // just render async for now - async remote request, later?
          //render 'Started catchup: ' + sstCatchupService.runCatchup()
          render 'TBD...'
-      }
+      //}
    }
 
    def runNext() {
-      task { // just render async for now - async remote request, later?
+    //  task { // just render async for now - async remote request, later?
          String result = sstCatchupService.runNext()
          render 'Ran next: ' + result
-      }
+      //}
    }
 }

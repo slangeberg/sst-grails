@@ -7,7 +7,9 @@ class SSTDayLongitudeValue {
 
    public static final short EMPTY_VALUE = -32768;
 
-   static belongsTo = [longitude:SSTDayLongitude]
+   static belongsTo = [day:SSTDay]
+
+   //Long longitudeId
 
    Short analysed_sst
 

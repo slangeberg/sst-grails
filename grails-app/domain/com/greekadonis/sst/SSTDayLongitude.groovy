@@ -2,10 +2,10 @@ package com.greekadonis.sst
 
 class SSTDayLongitude {
 
-   static belongsTo = [latitude:SSTDayLatitude]
+   static belongsTo = [day:SSTDay, latitude:SSTDayLatitude]
 
    Double lon
-   SSTDayLongitudeValue value
+   //SSTDayLongitudeValue value
 
    @Override
    String toString() {

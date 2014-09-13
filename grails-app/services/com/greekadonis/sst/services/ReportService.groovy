@@ -1,99 +1,170 @@
 package com.greekadonis.sst.services
 
 import com.greekadonis.sst.SSTDay
-import com.greekadonis.sst.SSTDayLatitude
-import com.greekadonis.sst.SSTDayLongitude
 import com.greekadonis.sst.SSTDayLongitudeValue
+import com.greekadonis.sst.model.SstDayModel
 import grails.transaction.Transactional
-import org.apache.commons.lang.math.RandomUtils
+import groovyx.gpars.GParsPool
 import org.apache.commons.lang3.time.StopWatch
 
-import javax.persistence.criteria.Order
 
 @Transactional
 class ReportService {
 
    List<SSTDay> mockDays = []
-
-   public Map<SSTDay, Double> getDailyAverages(boolean mock) {
-      getDailyAverages(mock, true)
-   }
+//
+//   public Map<SSTDay, Double> getDailyAverages(boolean mock) {
+//      getDailyAverages(mock, true)
+//   }
 
    //
    // @params mock - create mock data on server
    // @params cache - cache mock results, if any
    //
-   public Map<SSTDay, Double> getDailyAverages(boolean mock, boolean cache) {
+//   public Map<SSTDay, Double> getDailyAverages(boolean mock, boolean cache) {
+//      log.info("getDailyAverages(mock: $mock, cache: $cache)")
+//
+//      StopWatch timer = new StopWatch()
+//      timer.start()
+//
+//      Map<SSTDay, Double> dailyAverages = new LinkedHashMap<SSTDay, Double>()
+//      List<SSTDay> days =  SSTDay.list(sort:'sstIndex', order: 'asc')
+//
+//      log.info("getDailyAverages() - got ${days?.size()} days at: ${timer.time}ms")
+//
+////--> todo: Perform one day at time. parallelize as possible and persist results!
+//
+//      if( true ){
+//
+//         //just one, for now
+//         SSTDay day = days[0]
+//         if( day ) {
+//            dailyAverages[day] = getDailyAverage(day)
+//         }
+//      } else {
+//         days.each { SSTDay day ->
+//
+//            timer.split()
+//
+//            dailyAverages[day] = getDailyAverage(day)
+//
+//            log.debug "getDailyAverages() - calculated daily average in: ${timer.time - timer.splitTime}ms"
+//         }
+//      }
+//      log.info("getDailyAverages() - DONE in: ${timer.time}ms")
+//
+//      dailyAverages
+//   }
+
+   public Map<SstDayModel, Double> getDailyAverages(boolean mock, boolean cache) {
       log.info("getDailyAverages(mock: $mock, cache: $cache)")
 
       StopWatch timer = new StopWatch()
       timer.start()
 
-      Map<SSTDay, Double> dailyAverages = new LinkedHashMap<SSTDay, Double>()
-      List<SSTDay> days = []
-      if( mock ){
-         if( mockDays.empty || !cache ) {
-            mockDays = [
-               createDay(0, 10),
-               createDay(1, 20),
-               createDay(2, 30),
-               createDay(3, 40)
-            ]
-         }
-         days = mockDays
+      Map<SstDayModel, Double> dailyAverages = new LinkedHashMap<SstDayModel, Double>()
+      List<SSTDay> days =  SSTDay.list(sort:'sstIndex', order: 'asc')
 
+      log.info("getDailyAverages() - got ${days?.size()} days at: ${timer.time}ms")
+
+//--> todo: Perform one day at time. parallelize as possible and persist results!
+
+      if( true ){
+
+         //just one, for now
+         SSTDay day = days[0]
+         if( day ) {
+            dailyAverages[day] = getDailyAverage(day)
+         }
       } else {
-         days = SSTDay.list(sort:'sstIndex', order: 'asc')
-      }
-      log.info("getDailyAverages() - got days at: ${timer.time}ms")
+         days.each { SSTDay day ->
 
-      days.each { SSTDay day ->
+            timer.split()
 
-         timer.split()
+            dailyAverages[day] = getDailyAverage(day)
 
-         int count = 0
-         Double sum = 0
-         day.latitudes.each { SSTDayLatitude lat ->
-            lat.longitudes.each { SSTDayLongitude lon ->
-               if( log.debugEnabled ) {
-                  log.debug "getDailyAverages() - lon.value.isEmptyValue(): ${lon.value.isEmptyValue()}, lon.value.analysed_sst: ${lon.value.analysed_sst}"
-               }
-               if( !lon.value.isEmptyValue() ) {
-                  count++
-                  sum += lon.value.analysed_sst
-               }
-            }
+            log.debug "getDailyAverages() - calculated daily average in: ${timer.time - timer.splitTime}ms"
          }
-         dailyAverages[day] = sum / count
-
-         log.debug "getDailyAverages() - calculated daily average in: ${timer.time - timer.splitTime}ms"
       }
-
       log.info("getDailyAverages() - DONE in: ${timer.time}ms")
 
       dailyAverages
    }
 
+   Double getDailyAverage(SSTDay day){
+      log.info "getDailyAverage(day.sstIndex: ${day?.sstIndex})"
+
+      StopWatch timer = new StopWatch()
+      timer.start()
+
+      Double result = null
+
+      int count = 0
+      Double sum = 0
+
+      log.info "getDailyAverage() - day..detach()"
+
+      List<SSTDayLongitudeValue> values = SSTDayLongitudeValue.findAllWhere([day: day])
+      values*.discard()
+
+      GParsPool.withPool {
+         sum = values.parallel
+            .map { SSTDayLongitudeValue value ->
+               short sst = 0
+               if( !value.isEmptyValue() ) {
+                  count++
+                  sst = value.analysed_sst
+               }
+               sst
+            }
+            .sum()
+      }
+      if( count > 0 ) {
+         result = sum / count
+      }
+      log.info "getDailyAverage() day.sstIndex: ${day?.sstIndex}, sum: $sum, count: $count, result: $result"
+      log.info "getDailyAverage() - done in ${timer.time}ms"
+
+      result
+   }
+
+   Double getDailyModelAverage(SstDayModel day){
+      log.info "getDailyAverage(day.sstIndex: ${day?.sstIndex})"
+
+      StopWatch timer = new StopWatch()
+      timer.start()
+
+      Double result = null
+
+      int count = 0
+      Double sum = 0
+
+      log.info "getDailyAverage() - day..detach()"
+
+//      List<SSTDayLongitudeValue> values = SSTDayLongitudeValue.findAllWhere([day: day])
+//      values*.discard()
+//
+//      GParsPool.withPool {
+//         sum = values.parallel
+//            .map { SSTDayLongitudeValue value ->
+//               short sst = 0
+//               if( !value.isEmptyValue() ) {
+//                  count++
+//                  sst = value.analysed_sst
+//               }
+//               sst
+//            }
+//            .sum()
+//      }
+      if( count > 0 ) {
+         result = sum / count
+      }
+      log.info "getDailyAverage() day.sstIndex: ${day?.sstIndex}, sum: $sum, count: $count, result: $result"
+      log.info "getDailyAverage() - done in ${timer.time}ms"
+
+      result
+   }
+
    ///////////////
 
-   protected SSTDay createDay(int index, int value) {
-      List<SSTDayLatitude> latitudes = []
-      (0..99).each {
-         latitudes << createLatitude(it, value)
-      }
-      new SSTDay(sstIndex: index, latitudes: latitudes)
-   }
-
-   protected SSTDayLatitude createLatitude(int lat, int analysed_sst) {
-      List<SSTDayLatitude> longitudes = []
-      int temp = 0
-      (0..99).each {
-         temp = analysed_sst + RandomUtils.nextInt(10)
-         longitudes << new SSTDayLongitude(lon: it,
-            values: [
-               new SSTDayLongitudeValue(analysed_sst: temp)
-            ])
-      }
-      new SSTDayLatitude(lat: lat, longitudes: longitudes)
-   }
 }

@@ -28,8 +28,7 @@ class DataLoaderServiceSpec extends Specification {
       systemConfigService.getLongitudeParameters() >> "[0:1]"
    }
 
-   def cleanup() {
-   }
+   def cleanup() { }
 
    @Ignore("Stop loading real stuff!")
    void "Can load day when file content available"() {

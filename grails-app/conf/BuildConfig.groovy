@@ -7,6 +7,14 @@ grails.project.target.level = 1.6
 grails.project.source.level = 1.6
 grails.project.war.file = "target/${appName}.war"
 
+//
+// Want to DEBUG? Then must start initial console with debug, eg:
+// $grails -Ddebug=true
+//
+boolean debug = System.getProperty('debug', 'false').toBoolean()
+
+println "BuildConfig - debug: $debug"
+
 grails.project.fork = [
    // configure settings for compilation JVM, note that if you alter the Groovy version forked compilation is required
    //  compile: [maxMemory: 256, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
@@ -14,11 +22,11 @@ grails.project.fork = [
    // Intellij does not debug with forked process, by default
    test: false,  //[maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
    // run-app JVM
-   run: [maxMemory: 1536, minMemory: 1024, debug: false, maxPerm: 512, forkReserve:false],
+   run: [maxMemory: 2048, minMemory: 1024, debug: debug, maxPerm: 512, forkReserve:false],
    // run-war JVM
-   war: [maxMemory: 1536, minMemory: 1024, debug: false, maxPerm: 512, forkReserve:false],
+   war: [maxMemory: 2048, minMemory: 1024, debug: debug, maxPerm: 512, forkReserve:false],
    // Console UI JVM
-   console: [maxMemory: 768, minMemory: 256, debug: false, maxPerm: 256]
+   console: [maxMemory: 1024, minMemory: 512, debug: debug, maxPerm: 256]
 ]
 
 grails.project.dependency.resolver = "maven" // or ivy

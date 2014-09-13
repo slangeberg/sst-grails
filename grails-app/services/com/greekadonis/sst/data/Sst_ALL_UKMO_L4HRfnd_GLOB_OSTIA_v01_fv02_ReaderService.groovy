@@ -4,6 +4,8 @@ import com.greekadonis.sst.SSTDay
 import com.greekadonis.sst.SSTDayLatitude
 import com.greekadonis.sst.SSTDayLongitude
 import com.greekadonis.sst.SSTDayLongitudeValue
+import groovyx.gpars.GParsPool
+import org.apache.commons.lang3.time.StopWatch
 import org.joda.time.LocalDate
 import org.joda.time.format.ISODateTimeFormat
 
@@ -40,9 +42,19 @@ analysed_sst.lon[2]
 -179.975, -179.925
  */
 
-   public SSTDay getDay(String rawResult){
+   def saveWithSimpleJdbcService
+
+   public SSTDay getDay(int sstIndex, String rawResult){
 
       log.info "getDay(rawResult.size(): ${rawResult?.size()})"
+
+      StopWatch timer = new StopWatch()
+      timer.start()
+
+      if( rawResult?.empty ) {
+         log.warn '"rawResult" param cannot be null/empty'
+         return null
+      }
 
       Map<String, Object> model = [
          dataset: '',
@@ -56,7 +68,7 @@ analysed_sst.lon[2]
       // Takes raw results as returned from SST JPL remote service
       //
 
-      List<List<Integer>> sstVals = new ArrayList<List<Integer>>()
+      List<List<Short>> sstVals = new ArrayList<List<Short>>()
 
       boolean isDataSet = true
       boolean isAnalysedSst = false
@@ -92,7 +104,7 @@ analysed_sst.lon[2]
             return; //skip line
 
          } else if( line.startsWith("analysed_sst.lon") ) {
-            log.debug "isLat: TRUE"
+            log.debug "isLon: TRUE"
             isAnalysedSst = false
             isTime = false
             isLat = false
@@ -108,14 +120,17 @@ analysed_sst.lon[2]
          } else if ( isAnalysedSst ){
             isAnalysedSst = true
 
+//--> Todo: Minimize operations at line level - simply split file into groups of lines
+//          - which can be processed in parallel, after?
+
             line = line.replaceAll(" ", "")
             List split = line.split(",") as List
             split.remove(0) //should be coordinates, like: [lat][lon]
 
             //JSONArray lon = new JSONArray()
-            List<Integer> lon = []
+            List<Short> lon = []
             split.each {
-               lon << Integer.valueOf((it as String).trim())
+               lon << Short.valueOf((it as String).trim())
             }
             if( !lon.empty ) {
                sstVals << lon
@@ -140,30 +155,79 @@ analysed_sst.lon[2]
          }
       }
 
-      //log.debug "getModel() - sstVals: $sstVals"
+      log.info "getDay() - Text parsing completed at ${timer.time}ms"
 
-      SSTDay day = new SSTDay(dataset: model.dataset, time: model.time)
+      timer.split()
 
-      sstVals.eachWithIndex { List<Integer> lonValues, int latIndex ->
-         SSTDayLatitude latitude = new SSTDayLatitude(day: day, lat: model.latValues[latIndex])
-         List<SSTDayLongitude> longitudes = new ArrayList<SSTDayLongitude>()
-         lonValues.eachWithIndex { Integer value, int lonIndex ->
-            SSTDayLongitude longitude = new SSTDayLongitude(
-               day: day,
-               latitude: latitude,
-               lon: model.lonValues[lonIndex])
-            longitude.value = new SSTDayLongitudeValue(analysed_sst: value, longitude: longitude)
-            longitudes << longitude
+//--> Todo: Move persistence to calling class, as this class should only be reading (?)
+
+      SSTDay day = new SSTDay(dataset: model.dataset, sstIndex: sstIndex, time: model.time)
+      day.save(/*flush: true,*/ failOnError: true)
+
+
+//--> Todo: Again - can be split into parallel tasks?
+
+//      final List<SSTDayLongitudeValue> longitudeValues = []
+
+//      sstVals.eachWithIndex { List<Integer> lonValues, int latIndex ->
+//        // SSTDayLatitude latitude = new SSTDayLatitude(lat: model.latValues[latIndex])
+//         //List<SSTDayLongitude> longitudes = new ArrayList<SSTDayLongitude>()
+//         lonValues.eachWithIndex { Integer value, int lonIndex ->
+////            SSTDayLongitude longitude = new SSTDayLongitude(
+////               latitude: latitude,
+////               lon: model.lonValues[lonIndex])
+////            longitude.value = new SSTDayLongitudeValue(analysed_sst: value, longitudeId: longitudeId)
+////            longitudes << longitude
+//
+//            longitudeValues << new SSTDayLongitudeValue(day: day, analysed_sst: value)//, longitudeId: longitudeId)
+//         }
+//         //println "latitude: $latitude"
+////         latitude.longitudes = longitudes
+////         latitude.day = day
+//
+////         log.debug "latitude.longitudes: ${latitude.longitudes}"
+//
+//      //   model.latitudes << latitude
+//      }
+      // day.latitudes = new ArrayList(model.latitudes)
+
+//      SSTDayLongitudeValue longitudeValue
+
+      int count = 0
+
+      sstVals.eachWithIndex { List<Short> lonValues, int latIndex ->
+         lonValues.eachWithIndex { Short value, int lonIndex ->
+            //if( count < 10000 ) {
+               count ++
+               saveWithSimpleJdbcService.insertSstDayLongitudeValue(value, day.id)
+            //}
          }
-         //println "latitude: $latitude"
-         latitude.longitudes = longitudes
-
-//         log.debug "latitude.longitudes: ${latitude.longitudes}"
-
-         model.latitudes << latitude
       }
 
-      day.latitudes = new ArrayList(model.latitudes)
+//      GParsPool.withPool {
+//         sstVals.parallel{ List<Integer> lonValues ->
+//               lonValues.each { Integer value ->
+//                  longitudeValues << new SSTDayLongitudeValue(day: day, analysed_sst: value)
+//               }
+//            }
+//      }
+
+      log.info "getDay() - ${count} LongitudeValues inserted (jdbc) in: ${timer.time-timer.splitTime}ms"
+
+      log.info "getDay() - Total time: ${timer.time}ms"
+
       day
+   }
+
+   def sessionFactory
+   def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
+
+   def cleanUpGorm(int index) {
+      log.info "cleanUpGorm($index)"
+      
+      def session = sessionFactory.currentSession
+      session.flush()
+      session.clear()
+      propertyInstanceMap.get().clear()
    }
 }

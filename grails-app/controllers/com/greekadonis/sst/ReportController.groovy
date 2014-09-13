@@ -26,11 +26,22 @@ class ReportController {
          Boolean cache = params.getBoolean('cache')
          Boolean mock = params.getBoolean('mock')
 
-         Map<SSTDay, Double> dailyAverages = reportService.getDailyAverages(
-            mock != null ? mock : false,
-            cache != null ? cache : true)
+         SSTDay firstDay = SSTDay.findWhere([sstIndex: 0]) //dailyAverages?.keySet()[0]
 
-         SSTDay firstDay = dailyAverages?.keySet()[0]
+         List longitudeValues = SSTDayLongitudeValue.findAllWhere([day: firstDay])
+
+         Double sum = 0
+
+         longitudeValues.each { SSTDayLongitudeValue value ->
+            sum += value.analysed_sst
+         }
+
+         Map<SSTDay, Double> dailyAverages = [:]
+         dailyAverages[firstDay] = sum / longitudeValues.size()
+//            reportService.getDailyAverages(
+//               mock != null ? mock : false,
+//               cache != null ? cache : true)
+
 
          String page = """
    <style>
@@ -39,8 +50,7 @@ class ReportController {
 
    Lat/lon step size (1 is smallest, 2 is every other, etc.): ${systemConfigService.stepSize} <br/>
    #days: ${dailyAverages?.size()},
-   #latitudes/day: ${firstDay?.latitudes?.size()},
-   #longitudes/day: ${firstDay?.latitudes?.getAt(0)?.longitudes?.size()},
+   #longitudes/day: ${longitudeValues?.size()},
    time: $timer<br/>
    <br/>
    <h3>avg daily temps:</h3> <br/>
@@ -52,7 +62,7 @@ class ReportController {
      </tr>
    """
          dailyAverages.each { SSTDay day, Double average ->
-            page += "<tr><td>${day.sstIndex}</td><td>${day.time}</td><td>${average}</td></tr>"
+            page += "<tr><td>${day?.sstIndex}</td><td>${day?.time}</td><td>${average}</td></tr>"
          }
          page += "</table>"
          render page

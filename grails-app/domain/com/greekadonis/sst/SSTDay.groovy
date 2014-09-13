@@ -44,7 +44,7 @@ class SSTDay {
       dataset type: "text" // Default String is varchar(255)
    }
 
-   static hasMany = [latitudes: SSTDayLatitude]
+  // static hasMany = [latitudes: SSTDayLatitude]
 
    LocalDate time
 
@@ -53,6 +53,6 @@ class SSTDay {
 
    @Override
    String toString() {
-      "[SSTDay - id: $id, sstIndex: $sstIndex, time: $time, latitudes.size(): ${latitudes ? latitudes.size() : 'NULL'}]"
+      "[SSTDay - id: $id, sstIndex: $sstIndex, time: $time}]"
    }
 }

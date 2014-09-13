@@ -3,16 +3,15 @@ package com.greekadonis.sst.services
 import com.greekadonis.sst.test.TestData
 import spock.lang.*
 
-/**
- *
- */
 class DataLoaderServiceIntgSpec extends Specification {
 
    TestData testData = new TestData()
 
    def dataLoaderService
 
-   def setup() { }
+   def setup() {
+      dataLoaderService.fileBasePath = testData.filePath
+   }
 
    def cleanup() {    }
 
@@ -23,5 +22,10 @@ class DataLoaderServiceIntgSpec extends Specification {
 
       expect:
          file.isFile()
+   }
+
+   void "Can load sst from test file"(){
+      expect:
+      dataLoaderService.loadDayFromLocalFile('[0][0:20:3599][0:20:7199]')
    }
 }

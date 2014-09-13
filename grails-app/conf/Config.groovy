@@ -121,6 +121,9 @@ log4j.main = {
          debug 'grails.app'
 
          info 'grails.app.services.com.greekadonis.sst.services.ReportService'
+
+//         trace 'org.hibernate.type'
+//         debug 'org.hibernate.SQL'
       }
       test {
          debug "grails.app"
@@ -128,6 +131,7 @@ log4j.main = {
       production {
          // Set level for all application artifacts
          info "grails.app"
+//         debug "grails.app"
       }
    }
 
