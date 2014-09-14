@@ -42,6 +42,8 @@ analysed_sst.lon[2]
 -179.975, -179.925
  */
 
+   static transactional = false
+
    def saveWithSimpleJdbcService
 
    public SSTDay getDay(int sstIndex, String rawResult){
@@ -162,8 +164,9 @@ analysed_sst.lon[2]
 //--> Todo: Move persistence to calling class, as this class should only be reading (?)
 
       SSTDay day = new SSTDay(dataset: model.dataset, sstIndex: sstIndex, time: model.time)
-      day.save(/*flush: true,*/ failOnError: true)
+      day.save(flush: true, failOnError: true)
 
+      log.info "Saved day and flushed(): $day"
 
 //--> Todo: Again - can be split into parallel tasks?
 
@@ -195,11 +198,20 @@ analysed_sst.lon[2]
 
 
       int count = 0
+      int dayId = day.id
 
-      boolean useSimpleInsert = false
+      int INSERT_TYPE = 5
 
-      if( useSimpleInsert ) {
-         final int dayId = day.id
+      if( INSERT_TYPE == 1 ) {
+         List<Short> values = []
+         sstVals.each { List<Integer> lonValues  ->
+            lonValues.each { Short value ->
+               values << value
+            }
+         }
+         saveWithSimpleJdbcService.insertLongitudeValuesJdbcBatch(dayId, values)
+
+      } else if ( INSERT_TYPE == 2) {
          sstVals.eachWithIndex { List<Short> lonValues, int latIndex ->
             lonValues.eachWithIndex { Short value, int lonIndex ->
                //if( count < 10000 ) {
@@ -213,10 +225,37 @@ analysed_sst.lon[2]
                }
             }
          }
+      }  else if ( INSERT_TYPE == 3) {
+         List<Short> values = []
+         sstVals.each { List<Integer> lonValues  ->
+            lonValues.each { Short value ->
+               values << value
+            }
+         }
+         saveWithSimpleJdbcService.insertLongitudeValuesGroovySql(dayId, values)
+
+      }  else if ( INSERT_TYPE == 4) {
+         List<Short> values = []
+         sstVals.each { List<Integer> lonValues  ->
+            lonValues.each { Short value ->
+               values << value
+            }
+         }
+         saveWithSimpleJdbcService.insertLongitudeValuesGroovySqlBatch(dayId, values)
+
+      }   else if ( INSERT_TYPE == 5) {
+         List<Short> values = []
+         sstVals.each { List<Integer> lonValues  ->
+            lonValues.each { Short value ->
+               values << value
+            }
+         }
+         saveWithSimpleJdbcService.insertLongitudeValuesViaCSV(dayId, values)
+
       } else {
          List<SSTDayLongitudeValue> values = []
          sstVals.each { List<Integer> lonValues  ->
-            lonValues.each { Integer value ->
+            lonValues.each { Short value ->
                SSTDayLongitudeValue longitudeValue = new SSTDayLongitudeValue()
                longitudeValue.day = day
                longitudeValue.analysed_sst = value
@@ -236,7 +275,7 @@ analysed_sst.lon[2]
 
      // log.info "getDay() - ${count} LongitudeValues inserted (jdbc) in: ${timer.time-timer.splitTime}ms"
 
-      log.info "getDay() - Total time: ${timer.time}ms"
+      log.info "getDay() - Total time: $timer.time"
 
       day
    }

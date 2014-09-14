@@ -34,7 +34,7 @@ class SstCatchupService {
          SSTDay day = sstDayService.findLastLoadedDay()
          day = runCatchupForDay(day ? day.sstIndex + 1 : 0)
 
-         log.info "runCatchup() - went thru day in ${timer.time}ms"
+         log.info "runCatchup() - went thru day in ${timer}"
 
          msg = "Ran catchup for: $day"
       }

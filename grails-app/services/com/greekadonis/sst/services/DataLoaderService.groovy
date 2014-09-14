@@ -92,7 +92,7 @@ Dataset {
          log.info("loadDay($sstIndex) - DB MISS")
          day = loadDayFromRemoteSource(sstIndex)
       }
-      log.info "loadDay($sstIndex) - time: ${timer.time}ms"
+      log.info "loadDay($sstIndex) - time: $timer"
       day
    }
 
