@@ -193,15 +193,37 @@ analysed_sst.lon[2]
 
 //      SSTDayLongitudeValue longitudeValue
 
+
       int count = 0
 
-      sstVals.eachWithIndex { List<Short> lonValues, int latIndex ->
-         lonValues.eachWithIndex { Short value, int lonIndex ->
-            //if( count < 10000 ) {
-               count ++
-               saveWithSimpleJdbcService.insertSstDayLongitudeValue(value, day.id)
-            //}
+      boolean useSimpleInsert = false
+
+      if( useSimpleInsert ) {
+         final int dayId = day.id
+         sstVals.eachWithIndex { List<Short> lonValues, int latIndex ->
+            lonValues.eachWithIndex { Short value, int lonIndex ->
+               //if( count < 10000 ) {
+               count++
+               saveWithSimpleJdbcService.insertSstDayLongitudeValue(value, dayId)
+
+               if (count % 10000 == 0) {
+                  log.info "getDay() - 10000 @ $count LV records inserted (no batching) in: ${timer.time - timer.splitTime}ms"
+
+                  timer.split()
+               }
+            }
          }
+      } else {
+         List<SSTDayLongitudeValue> values = []
+         sstVals.each { List<Integer> lonValues  ->
+            lonValues.each { Integer value ->
+               SSTDayLongitudeValue longitudeValue = new SSTDayLongitudeValue()
+               longitudeValue.day = day
+               longitudeValue.analysed_sst = value
+               values << longitudeValue
+            }
+         }
+         saveWithSimpleJdbcService.insertLongitudeValues(values)
       }
 
 //      GParsPool.withPool {
@@ -212,7 +234,7 @@ analysed_sst.lon[2]
 //            }
 //      }
 
-      log.info "getDay() - ${count} LongitudeValues inserted (jdbc) in: ${timer.time-timer.splitTime}ms"
+     // log.info "getDay() - ${count} LongitudeValues inserted (jdbc) in: ${timer.time-timer.splitTime}ms"
 
       log.info "getDay() - Total time: ${timer.time}ms"
 
@@ -223,7 +245,7 @@ analysed_sst.lon[2]
    def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
 
    def cleanUpGorm(int index) {
-      log.info "cleanUpGorm($index)"
+     // log.info "cleanUpGorm($index)"
       
       def session = sessionFactory.currentSession
       session.flush()
