@@ -19,9 +19,12 @@ class ReportController {
    }
 
    def averages() {
-    //  task { // could be a while !
+      task { // could be a while !
          StopWatch timer = new StopWatch()
          timer.start()
+
+
+ //--> todo: Just return DailyAverageTemp objects instead of maps - then can get things like LongitudeValue counts, etc, right off that class??
 
          Map<SSTDay, Double> dailyAverages = reportService.getDailyAverages()
          SSTDay firstDay = dailyAverages?.keySet()[0]
@@ -50,6 +53,6 @@ class ReportController {
          }
          page += "</table>"
          render page
-    //  }
+      }
    }
 }
