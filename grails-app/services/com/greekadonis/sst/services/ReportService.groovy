@@ -3,6 +3,7 @@ package com.greekadonis.sst.services
 import com.greekadonis.sst.SSTDay
 import com.greekadonis.sst.SSTDayLongitudeValue
 import com.greekadonis.sst.model.SstDayModel
+import com.greekadonis.sst.report.DailyAverageTemp
 import grails.transaction.Transactional
 import groovyx.gpars.GParsPool
 import org.apache.commons.lang3.time.StopWatch
@@ -39,38 +40,12 @@ class ReportService {
    Double getDailyAverage(SSTDay day){
       log.info "getDailyAverage(day.sstIndex: ${day?.sstIndex})"
 
-      StopWatch timer = new StopWatch()
-      timer.start()
-
-      Double result = null
-
-      int count = 0
-      Double sum = 0
-
-      log.info "getDailyAverage() - day..detach()"
-
-      List<SSTDayLongitudeValue> values = SSTDayLongitudeValue.findAllWhere([day: day])
-      values*.discard()
-
-      GParsPool.withPool {
-         sum = values.parallel
-            .map { SSTDayLongitudeValue value ->
-               short sst = 0
-               if( value.isNotEmptyValue() ) {
-                  count++
-                  sst = value.analysed_sst
-               }
-               sst
-            }
-            .sum()
+      DailyAverageTemp averageTemp = DailyAverageTemp.findWhere([day: day])
+      if( !averageTemp ){
+         averageTemp = new DailyAverageTemp(day: day)
+         averageTemp.save()
       }
-      if( count > 0 ) {
-         result = sum / count
-      }
-      log.info "getDailyAverage() day.sstIndex: ${day?.sstIndex}, sum: $sum, count: $count, result: $result"
-      log.info "getDailyAverage() - done in ${timer}"
-
-      result
+      averageTemp.value
    }
 
 }

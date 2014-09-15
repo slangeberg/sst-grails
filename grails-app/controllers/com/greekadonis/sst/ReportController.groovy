@@ -23,20 +23,9 @@ class ReportController {
          StopWatch timer = new StopWatch()
          timer.start()
 
-         Boolean cache = params.getBoolean('cache')
-         Boolean mock = params.getBoolean('mock')
-
-         SSTDay firstDay = SSTDay.findWhere([sstIndex: 0]) //dailyAverages?.keySet()[0]
-
-         List longitudeValues = SSTDayLongitudeValue.findAllWhere([day: firstDay])
-
-         Double sum = 0
-
-         longitudeValues.each { SSTDayLongitudeValue value ->
-            sum += value.analysed_sst
-         }
-
          Map<SSTDay, Double> dailyAverages = reportService.getDailyAverages()
+         SSTDay firstDay = dailyAverages?.keySet()[0]
+         Long numLongValues = SSTDayLongitudeValue.countByDay(firstDay)
 
          String page = """
    <style>
@@ -45,7 +34,7 @@ class ReportController {
 
    Lat/lon step size (1 is smallest, 2 is every other, etc.): ${systemConfigService.stepSize} <br/>
    #days: ${dailyAverages?.size()},
-   #longitudes/day: ${longitudeValues?.size()},
+   #longitudes/day: $numLongValues,
    time: $timer<br/>
    <br/>
    <h3>avg daily temps:</h3> <br/>
