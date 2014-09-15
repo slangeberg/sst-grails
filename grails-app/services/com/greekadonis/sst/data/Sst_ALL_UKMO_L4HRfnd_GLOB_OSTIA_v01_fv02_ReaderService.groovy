@@ -39,7 +39,7 @@ analysed_sst.lon[2]
 -179.975, -179.925
  */
 
-   static transactional = false
+   static transactional = true
 
    def saveWithSimpleJdbcService
 
@@ -194,84 +194,22 @@ analysed_sst.lon[2]
 //      SSTDayLongitudeValue longitudeValue
 
 
-      int count = 0
-      int dayId = day.id
+      List<SSTDayLongitudeValue> values = []
+      sstVals.each { List<Integer> lonValues  ->
+         lonValues.each { Short value ->
+            SSTDayLongitudeValue longitudeValue = new SSTDayLongitudeValue()
+            longitudeValue.day = day
+            longitudeValue.analysed_sst = value
+            values << longitudeValue
+         }
+      }
 
-      int INSERT_TYPE = 7
+      int INSERT_TYPE = 1
 
       if( INSERT_TYPE == 1 ) {
-         List<Short> values = []
-         sstVals.each { List<Integer> lonValues  ->
-            lonValues.each { Short value ->
-               values << value
-            }
-         }
-         saveWithSimpleJdbcService.insertLongitudeValuesJdbcBatch(dayId, values)
-
-      } else if ( INSERT_TYPE == 2) {
-         sstVals.eachWithIndex { List<Short> lonValues, int latIndex ->
-            lonValues.eachWithIndex { Short value, int lonIndex ->
-               //if( count < 10000 ) {
-               count++
-               saveWithSimpleJdbcService.insertSstDayLongitudeValue(value, dayId)
-
-               if (count % 10000 == 0) {
-                  log.info "getDay() - 10000 @ $count LV records inserted (no batching) in: ${timer.time - timer.splitTime}ms"
-
-                  timer.split()
-               }
-            }
-         }
-      }  else if ( INSERT_TYPE == 3) {
-         List<Short> values = []
-         sstVals.each { List<Integer> lonValues  ->
-            lonValues.each { Short value ->
-               values << value
-            }
-         }
-         saveWithSimpleJdbcService.insertLongitudeValuesGroovySql(dayId, values)
-
-      }  else if ( INSERT_TYPE == 4) {
-         List<Short> values = []
-         sstVals.each { List<Integer> lonValues  ->
-            lonValues.each { Short value ->
-               values << value
-            }
-         }
-         saveWithSimpleJdbcService.insertLongitudeValuesGroovySqlBatch(dayId, values)
-
-      }   else if ( INSERT_TYPE == 5) {
-         List<Short> values = []
-         sstVals.each { List<Integer> lonValues  ->
-            lonValues.each { Short value ->
-               values << value
-            }
-         }
-         saveWithSimpleJdbcService.insertLongitudeValuesViaCSV(dayId, values)
-
-      } else if (INSERT_TYPE == 6) {
-         List<SSTDayLongitudeValue> values = []
-         sstVals.each { List<Integer> lonValues  ->
-            lonValues.each { Short value ->
-               SSTDayLongitudeValue longitudeValue = new SSTDayLongitudeValue()
-               longitudeValue.day = day
-               longitudeValue.analysed_sst = value
-               values << longitudeValue
-            }
-         }
-         log.info "getDay() - going to batch with Gorm..."
-         values*.save()
+         saveWithSimpleJdbcService.insertLongitudeValuesGroovySqlBatch(values)
 
       } else if (INSERT_TYPE == 7) {
-         List<SSTDayLongitudeValue> values = []
-         sstVals.each { List<Integer> lonValues  ->
-            lonValues.each { Short value ->
-               SSTDayLongitudeValue longitudeValue = new SSTDayLongitudeValue()
-               longitudeValue.day = day
-               longitudeValue.analysed_sst = value
-               values << longitudeValue
-            }
-         }
          saveWithSimpleJdbcService.insertLongitudeValuesWithStatelessSession(values)
       }
 

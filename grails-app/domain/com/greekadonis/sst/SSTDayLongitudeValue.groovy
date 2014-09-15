@@ -16,4 +16,8 @@ class SSTDayLongitudeValue {
    boolean isEmptyValue() {
       analysed_sst == EMPTY_VALUE
    }
+
+   boolean isNotEmptyValue() {
+      !isEmptyValue()
+   }
 }

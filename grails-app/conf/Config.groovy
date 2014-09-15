@@ -120,7 +120,7 @@ log4j.main = {
       development {
          debug 'grails.app'
 
-         info 'grails.app.services.com.greekadonis.sst.services.ReportService'
+         info 'grails.app.services.com.greekadonis.sst.services'
 
 //         trace 'org.hibernate.type'
 //         debug 'org.hibernate.SQL'

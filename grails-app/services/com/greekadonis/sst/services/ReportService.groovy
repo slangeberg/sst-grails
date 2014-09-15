@@ -7,57 +7,11 @@ import grails.transaction.Transactional
 import groovyx.gpars.GParsPool
 import org.apache.commons.lang3.time.StopWatch
 
-
 @Transactional
 class ReportService {
 
-   List<SSTDay> mockDays = []
-//
-//   public Map<SSTDay, Double> getDailyAverages(boolean mock) {
-//      getDailyAverages(mock, true)
-//   }
-
-   //
-   // @params mock - create mock data on server
-   // @params cache - cache mock results, if any
-   //
-//   public Map<SSTDay, Double> getDailyAverages(boolean mock, boolean cache) {
-//      log.info("getDailyAverages(mock: $mock, cache: $cache)")
-//
-//      StopWatch timer = new StopWatch()
-//      timer.start()
-//
-//      Map<SSTDay, Double> dailyAverages = new LinkedHashMap<SSTDay, Double>()
-//      List<SSTDay> days =  SSTDay.list(sort:'sstIndex', order: 'asc')
-//
-//      log.info("getDailyAverages() - got ${days?.size()} days at: ${timer.time}ms")
-//
-////--> todo: Perform one day at time. parallelize as possible and persist results!
-//
-//      if( true ){
-//
-//         //just one, for now
-//         SSTDay day = days[0]
-//         if( day ) {
-//            dailyAverages[day] = getDailyAverage(day)
-//         }
-//      } else {
-//         days.each { SSTDay day ->
-//
-//            timer.split()
-//
-//            dailyAverages[day] = getDailyAverage(day)
-//
-//            log.debug "getDailyAverages() - calculated daily average in: ${timer.time - timer.splitTime}ms"
-//         }
-//      }
-//      log.info("getDailyAverages() - DONE in: ${timer.time}ms")
-//
-//      dailyAverages
-//   }
-
-   public Map<SstDayModel, Double> getDailyAverages(boolean mock, boolean cache) {
-      log.info("getDailyAverages(mock: $mock, cache: $cache)")
+   public Map<SstDayModel, Double> getDailyAverages() {
+      log.info("getDailyAverages()")
 
       StopWatch timer = new StopWatch()
       timer.start()
@@ -69,24 +23,15 @@ class ReportService {
 
 //--> todo: Perform one day at time. parallelize as possible and persist results!
 
-      if( true ){
+      days.each { SSTDay day ->
 
-         //just one, for now
-         SSTDay day = days[0]
-         if( day ) {
-            dailyAverages[day] = getDailyAverage(day)
-         }
-      } else {
-         days.each { SSTDay day ->
+         timer.split()
 
-            timer.split()
+         dailyAverages[day] = getDailyAverage(day)
 
-            dailyAverages[day] = getDailyAverage(day)
-
-            log.debug "getDailyAverages() - calculated daily average in: ${timer.time - timer.splitTime}ms"
-         }
+         log.debug "getDailyAverages() - calculated daily average in: ${timer.time - timer.splitTime}ms"
       }
-      log.info("getDailyAverages() - DONE in: ${timer.time}ms")
+      log.info("getDailyAverages() - DONE in: ${timer}")
 
       dailyAverages
    }
@@ -111,7 +56,7 @@ class ReportService {
          sum = values.parallel
             .map { SSTDayLongitudeValue value ->
                short sst = 0
-               if( !value.isEmptyValue() ) {
+               if( value.isNotEmptyValue() ) {
                   count++
                   sst = value.analysed_sst
                }
@@ -123,48 +68,9 @@ class ReportService {
          result = sum / count
       }
       log.info "getDailyAverage() day.sstIndex: ${day?.sstIndex}, sum: $sum, count: $count, result: $result"
-      log.info "getDailyAverage() - done in ${timer.time}ms"
+      log.info "getDailyAverage() - done in ${timer}"
 
       result
    }
-
-   Double getDailyModelAverage(SstDayModel day){
-      log.info "getDailyAverage(day.sstIndex: ${day?.sstIndex})"
-
-      StopWatch timer = new StopWatch()
-      timer.start()
-
-      Double result = null
-
-      int count = 0
-      Double sum = 0
-
-      log.info "getDailyAverage() - day..detach()"
-
-//      List<SSTDayLongitudeValue> values = SSTDayLongitudeValue.findAllWhere([day: day])
-//      values*.discard()
-//
-//      GParsPool.withPool {
-//         sum = values.parallel
-//            .map { SSTDayLongitudeValue value ->
-//               short sst = 0
-//               if( !value.isEmptyValue() ) {
-//                  count++
-//                  sst = value.analysed_sst
-//               }
-//               sst
-//            }
-//            .sum()
-//      }
-      if( count > 0 ) {
-         result = sum / count
-      }
-      log.info "getDailyAverage() day.sstIndex: ${day?.sstIndex}, sum: $sum, count: $count, result: $result"
-      log.info "getDailyAverage() - done in ${timer.time}ms"
-
-      result
-   }
-
-   ///////////////
 
 }

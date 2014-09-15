@@ -36,12 +36,7 @@ class ReportController {
             sum += value.analysed_sst
          }
 
-         Map<SSTDay, Double> dailyAverages = [:]
-         dailyAverages[firstDay] = sum / longitudeValues.size()
-//            reportService.getDailyAverages(
-//               mock != null ? mock : false,
-//               cache != null ? cache : true)
-
+         Map<SSTDay, Double> dailyAverages = reportService.getDailyAverages()
 
          String page = """
    <style>
