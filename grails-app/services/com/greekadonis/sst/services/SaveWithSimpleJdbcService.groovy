@@ -155,7 +155,6 @@ class SaveWithSimpleJdbcService {
       StopWatch timer = new StopWatch()
       timer.start()
 
-      int count = 0
       final String baseQuery = 'insert into SSTDAY_LONGITUDE_VALUE (VERSION, ANALYSED_SST, DAY_ID) values (?, ?, ?)'
 
       log.info "insertLongitudeValuesGroovySqlBatch(transactional: false) - values.size: ${values?.size()}"
@@ -164,42 +163,38 @@ class SaveWithSimpleJdbcService {
 
       Sql mySql = Sql.newInstance(dataSource)
 
-//--> TODO: !!!!!!! get this out of transactional hibernate / spring calls - move to controller invoked?
+      int batchSize = 50
 
-      int batchSize = 20
-
-      sql.withBatch(batchSize, baseQuery ) { BatchingPreparedStatementWrapper ps ->
+      mySql.withBatch(batchSize, baseQuery ) { BatchingPreparedStatementWrapper ps ->
          for( Short value : values) {
-            count++
-
             ps.addBatch 0, value, dayId
-
-            if( count % 10000 == 0 ){
-               log.info "... batchSize: $batchSize @ $count in ${timer.time-timer.splitTime}ms, total time: $timer"
-
-               timer.split()
-            }
          }
       }
 
       mySql.close()
 
-      log.info "insertLongitudeValuesGroovySqlBatch() - insertion done in $timer"
+      log.info "insertLongitudeValuesGroovySqlBatch() - inserts with batchSize: $batchSize done in $timer"
    }
 
    def insertLongitudeValuesViaCSV(Long dayId, List<Short> values){
       StopWatch timer = new StopWatch()
       timer.start()
 
-      int count = 0
-      final String baseQuery = 'insert into SSTDAY_LONGITUDE_VALUE (VERSION, ANALYSED_SST, DAY_ID) values (?, ?, ?)'
+      String columns = 'VERSION, ANALYSED_SST, DAY_ID'
 
-      log.info "insertLongitudeValuesViaCSV(transactional: false) - values.size: ${values?.size()}"
+      String csvPath = 'data/test2.csv'
+      File csv = new File(csvPath)
+      csv.text = "$columns, ${System.lineSeparator()}"
+      for( Short value : values ){
+         csv << "0, $value, $dayId, ${System.lineSeparator()}"
+      }
+
+      log.info "insertLongitudeValuesViaCSV(transactional: false) - values.size: ${values?.size()}, created CSV at: $timer"
 
       timer.split()
 
       Sql mysql = Sql.newInstance(dataSource)
-      String query = "insert into SSTDAY_LONGITUDE_VALUE (VERSION, ANALYSED_SST, DAY_ID) SELECT * FROM CSVREAD('data/test.csv')"
+      String query = "insert into SSTDAY_LONGITUDE_VALUE (VERSION, ANALYSED_SST, DAY_ID) SELECT * FROM CSVREAD('$csvPath')"
       mysql.execute(query) { isResultSet, result ->
          log.info "isResultSet: $isResultSet, result: $result"
       }
@@ -219,22 +214,22 @@ class SaveWithSimpleJdbcService {
 
    /*
 ..trying stateless session!!...
-2014-09-13 21:34:24,531 [http-bio-8888-exec-4] INFO  services.SaveWithSimpleJdbcService  - insertLongitudeValues() - last id: 10000 - 10000 (stateless) LV records @ 10000 saved: 	2436
-2014-09-13 21:34:29,545 [http-bio-8888-exec-4] INFO  services.SaveWithSimpleJdbcService  - insertLongitudeValues() - last id: 20000 - 10000 (stateless) LV records @ 20000 saved: 	5014
-2014-09-13 21:34:39,529 [http-bio-8888-exec-4] INFO  services.SaveWithSimpleJdbcService  - insertLongitudeValues() - last id: 30000 - 10000 (stateless) LV records @ 30000 saved: 	9982
-2014-09-13 21:34:48,892 [http-bio-8888-exec-4] INFO  services.SaveWithSimpleJdbcService  - insertLongitudeValues() - last id: 40000 - 10000 (stateless) LV records @ 40000 saved: 	9363
-2014-09-13 21:34:58,592 [http-bio-8888-exec-4] INFO  services.SaveWithSimpleJdbcService  - insertLongitudeValues() - last id: 50000 - 10000 (stateless) LV records @ 50000 saved: 	9700
-2014-09-13 21:35:13,595 [http-bio-8888-exec-4] INFO  services.SaveWithSimpleJdbcService  - insertLongitudeValues() - last id: 60000 - 10000 (stateless) LV records @ 60000 saved: 	15003
-2014-09-13 21:35:34,268 [http-bio-8888-exec-4] INFO  services.SaveWithSimpleJdbcService  - insertLongitudeValues() - last id: 70000 - 10000 (stateless) LV records @ 70000 saved: 	20673
-2014-09-13 21:36:00,593 [http-bio-8888-exec-4] INFO  services.SaveWithSimpleJdbcService  - insertLongitudeValues() - last id: 80000 - 10000 (stateless) LV records @ 80000 saved: 	26325
-2014-09-13 21:36:33,037 [http-bio-8888-exec-4] INFO  services.SaveWithSimpleJdbcService  - insertLongitudeValues() - last id: 90000 - 10000 (stateless) LV records @ 90000 saved: 	32444
-2014-09-13 21:37:11,943 [http-bio-8888-exec-4] INFO  services.SaveWithSimpleJdbcService  - insertLongitudeValues() - last id: 100000 - 10000 (stateless) LV records @ 100000 saved: 	38906
+2014-09-13 21:34:24,531 [http-bio-8888-exec-4] INFO  services.SaveWithSimpleJdbcService  - insertLongitudeValuesWithStatelessSession() - last id: 10000 - 10000 (stateless) LV records @ 10000 saved: 	2436
+2014-09-13 21:34:29,545 [http-bio-8888-exec-4] INFO  services.SaveWithSimpleJdbcService  - insertLongitudeValuesWithStatelessSession() - last id: 20000 - 10000 (stateless) LV records @ 20000 saved: 	5014
+2014-09-13 21:34:39,529 [http-bio-8888-exec-4] INFO  services.SaveWithSimpleJdbcService  - insertLongitudeValuesWithStatelessSession() - last id: 30000 - 10000 (stateless) LV records @ 30000 saved: 	9982
+2014-09-13 21:34:48,892 [http-bio-8888-exec-4] INFO  services.SaveWithSimpleJdbcService  - insertLongitudeValuesWithStatelessSession() - last id: 40000 - 10000 (stateless) LV records @ 40000 saved: 	9363
+2014-09-13 21:34:58,592 [http-bio-8888-exec-4] INFO  services.SaveWithSimpleJdbcService  - insertLongitudeValuesWithStatelessSession() - last id: 50000 - 10000 (stateless) LV records @ 50000 saved: 	9700
+2014-09-13 21:35:13,595 [http-bio-8888-exec-4] INFO  services.SaveWithSimpleJdbcService  - insertLongitudeValuesWithStatelessSession() - last id: 60000 - 10000 (stateless) LV records @ 60000 saved: 	15003
+2014-09-13 21:35:34,268 [http-bio-8888-exec-4] INFO  services.SaveWithSimpleJdbcService  - insertLongitudeValuesWithStatelessSession() - last id: 70000 - 10000 (stateless) LV records @ 70000 saved: 	20673
+2014-09-13 21:36:00,593 [http-bio-8888-exec-4] INFO  services.SaveWithSimpleJdbcService  - insertLongitudeValuesWithStatelessSession() - last id: 80000 - 10000 (stateless) LV records @ 80000 saved: 	26325
+2014-09-13 21:36:33,037 [http-bio-8888-exec-4] INFO  services.SaveWithSimpleJdbcService  - insertLongitudeValuesWithStatelessSession() - last id: 90000 - 10000 (stateless) LV records @ 90000 saved: 	32444
+2014-09-13 21:37:11,943 [http-bio-8888-exec-4] INFO  services.SaveWithSimpleJdbcService  - insertLongitudeValuesWithStatelessSession() - last id: 100000 - 10000 (stateless) LV records @ 100000 saved: 	38906
 
 
 .. def better than stateful..
 
     */
-   void insertLongitudeValues(List<SSTDayLongitudeValue> values){
+   void insertLongitudeValuesWithStatelessSession(List<SSTDayLongitudeValue> values){
 
       StopWatch timer = new StopWatch()
       timer.start()
@@ -244,23 +239,20 @@ class SaveWithSimpleJdbcService {
       Iterator<SSTDayLongitudeValue> iter = values.iterator()
       int i = 0
 
-      log.info "insertLongValues(values.size: ${values?.size()}, trans open at ${timer.time}ms"
+      log.info "insertLongitudeValuesWithStatelessSession(values.size: ${values?.size()}, trans open at ${timer.time}ms"
 
       timer.split()
 
       def id = null
 
-      while(iter.hasNext()){
+      while(iter.hasNext())
+
          id = session.insert(iter.next());
+
          if( ++i % 10000 == 0 ){
-           log.info "insertLongitudeValues() - last id: $id - 10000 (stateless) LV records @ $i saved: ${timer.time-timer.splitTime}ms"
-            timer.split()
+           log.info "insertLongitudeValuesWithStatelessSession() - last id: $id - 10000 (stateless) LV records @ $i saved: ${timer.time-timer.splitTime}ms"
+           timer.split(){
          }
-//         if ( ++i % BATCH_SIZE == 0 ) { //same as the JDBC batch size
-//            //flush a batch of inserts and release memory:
-//            session.flush();
-//            session.clear();
-//         }
       }
       tx.commit();
       session.close();

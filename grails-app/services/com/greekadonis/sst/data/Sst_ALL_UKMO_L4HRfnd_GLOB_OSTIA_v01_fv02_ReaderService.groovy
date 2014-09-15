@@ -2,11 +2,8 @@ package com.greekadonis.sst.data
 
 import com.greekadonis.sst.SSTDay
 import com.greekadonis.sst.SSTDayLatitude
-import com.greekadonis.sst.SSTDayLongitude
 import com.greekadonis.sst.SSTDayLongitudeValue
-import groovyx.gpars.GParsPool
 import org.apache.commons.lang3.time.StopWatch
-import org.joda.time.LocalDate
 import org.joda.time.format.ISODateTimeFormat
 
 //@GrailsCompileStatic
@@ -200,7 +197,7 @@ analysed_sst.lon[2]
       int count = 0
       int dayId = day.id
 
-      int INSERT_TYPE = 5
+      int INSERT_TYPE = 7
 
       if( INSERT_TYPE == 1 ) {
          List<Short> values = []
@@ -252,7 +249,7 @@ analysed_sst.lon[2]
          }
          saveWithSimpleJdbcService.insertLongitudeValuesViaCSV(dayId, values)
 
-      } else {
+      } else if (INSERT_TYPE == 6) {
          List<SSTDayLongitudeValue> values = []
          sstVals.each { List<Integer> lonValues  ->
             lonValues.each { Short value ->
@@ -262,7 +259,20 @@ analysed_sst.lon[2]
                values << longitudeValue
             }
          }
-         saveWithSimpleJdbcService.insertLongitudeValues(values)
+         log.info "getDay() - going to batch with Gorm..."
+         values*.save()
+
+      } else if (INSERT_TYPE == 7) {
+         List<SSTDayLongitudeValue> values = []
+         sstVals.each { List<Integer> lonValues  ->
+            lonValues.each { Short value ->
+               SSTDayLongitudeValue longitudeValue = new SSTDayLongitudeValue()
+               longitudeValue.day = day
+               longitudeValue.analysed_sst = value
+               values << longitudeValue
+            }
+         }
+         saveWithSimpleJdbcService.insertLongitudeValuesWithStatelessSession(values)
       }
 
 //      GParsPool.withPool {
@@ -275,7 +285,7 @@ analysed_sst.lon[2]
 
      // log.info "getDay() - ${count} LongitudeValues inserted (jdbc) in: ${timer.time-timer.splitTime}ms"
 
-      log.info "getDay() - Total time: $timer.time"
+      log.info "getDay() - Total time: $timer"
 
       day
    }
