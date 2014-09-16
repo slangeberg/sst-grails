@@ -19,7 +19,7 @@ class ReportController {
    }
 
    def averages() {
-      task { // could be a while !
+     // task { // could be a while !
          StopWatch timer = new StopWatch()
          timer.start()
 
@@ -54,5 +54,5 @@ class ReportController {
          page += "</table>"
          render page
       }
-   }
+   //}
 }
