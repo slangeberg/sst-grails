@@ -22,22 +22,29 @@ class ReportService {
 
       log.info("getDailyAverages() - got ${days?.size()} days at: ${timer.time}ms")
 
-//--> todo: Perform one day at time. parallelize as possible and persist results!
+      List<DailyAverageTemp> averageValues = []
 
-      days.each { SSTDay day ->
-
-         timer.split()
-
-         dailyAverages[day] = getDailyAverage(day)
-
-         log.debug "getDailyAverages() - calculated daily average in: ${timer.time - timer.splitTime}ms"
+      GParsPool.withPool {
+         averageValues = days.parallel
+            .map { SSTDay day ->
+               getDailyAverage(day)
+            }
+            .collection
       }
+
+//--> todo: Just return the domain objects
+
+      averageValues.each {
+         it.refresh()
+         dailyAverages[it.day] = it.value
+      }
+
       log.info("getDailyAverages() - DONE in: ${timer}")
 
       dailyAverages
    }
 
-   Double getDailyAverage(SSTDay day){
+   DailyAverageTemp getDailyAverage(SSTDay day){
       log.info "getDailyAverage(day.sstIndex: ${day?.sstIndex})"
 
       DailyAverageTemp averageTemp = DailyAverageTemp.findWhere([day: day])
@@ -45,7 +52,8 @@ class ReportService {
          averageTemp = new DailyAverageTemp(day: day)
          averageTemp.save()
       }
-      averageTemp.value
+      averageTemp.triggerCalculation()
+      averageTemp
    }
 
 }

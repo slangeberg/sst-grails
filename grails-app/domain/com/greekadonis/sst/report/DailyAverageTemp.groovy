@@ -13,10 +13,10 @@ class DailyAverageTemp {
 
    Double getValue() {
       if( value ){
-         log.info "getValue() - db HIT"
+         log.debug "getValue() - db HIT"
 
       } else {
-         log.info "getValue() - db MISS"
+         log.debug "getValue() - db MISS"
 
          StopWatch timer = new StopWatch()
          timer.start()
@@ -25,8 +25,6 @@ class DailyAverageTemp {
 
          int count = 0
          Double sum = 0
-
-         log.info "getValue() - day..detach()"
 
          List<SSTDayLongitudeValue> values = SSTDayLongitudeValue.findAllWhere([day: day])
          values*.discard()
@@ -51,9 +49,15 @@ class DailyAverageTemp {
 
          save()
 
-         log.info "getValue() day.sstIndex: ${day?.sstIndex}, sum: $sum, count: $count, result: $result"
-         log.info "getValue() - done and saved() in ${timer}"
+         if( log.infoEnabled ) {
+            log.info "getValue() day.sstIndex: ${day?.sstIndex}, sum: $sum, count: $count, result: $result"
+            log.info "getValue() - done and saved() in ${timer}"
+         }
       }
       value
+   }
+
+   Double triggerCalculation(){
+      getValue()
    }
 }

@@ -40,7 +40,7 @@ class ReportController {
    #longitudes/day: $numLongValues,
    time: $timer<br/>
    <br/>
-   <h3>avg daily temps:</h3> <br/>
+   <h3>Global avg daily temps:</h3> <br/>
    <table>
      <tr>
        <th>SST Index</th>
